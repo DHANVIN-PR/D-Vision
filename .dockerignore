@@ -1,0 +1,29 @@
+# Git
+.git
+.gitignore
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Node (not needed inside container)
+node_modules/
+package.json
+package-lock.json
+
+# IDE files
+.vscode/
+.idea/
+
+# Local DB (will be mounted or recreated at runtime)
+instance/database.db
+
+# Logs
+*.log

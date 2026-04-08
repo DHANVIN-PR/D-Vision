@@ -1,0 +1,89 @@
+# ═══════════════════════════════════════════════════════════════════
+#  D-Vision CI/CD Pipeline
+#  Triggers on every push to main → builds Docker image →
+#  pushes to Azure Container Registry → deploys to App Service
+# ═══════════════════════════════════════════════════════════════════
+
+trigger:
+  branches:
+    include:
+      - main          # Auto-deploy on every push to main branch
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+# ─── Pipeline Variables ────────────────────────────────────────────
+# Replace these with YOUR actual values
+variables:
+  ACR_NAME: 'dvisionacr'                        # Your ACR name (no .azurecr.io)
+  IMAGE_NAME: 'dvision-app'                     # Docker image name
+  APP_SERVICE_NAME: 'dvision-app-service'       # Your Azure App Service name
+  RESOURCE_GROUP: 'dvision-rg'                  # Your Azure Resource Group
+  ACR_LOGIN_SERVER: '$(ACR_NAME).azurecr.io'   # Full ACR URL (auto-built)
+  IMAGE_TAG: '$(Build.BuildId)'                 # Unique tag per build
+
+# ─── Stages ───────────────────────────────────────────────────────
+stages:
+
+# ══════════════════════════════════════════
+# STAGE 1: Build & Push Docker Image to ACR
+# ══════════════════════════════════════════
+- stage: Build
+  displayName: '🐳 Build & Push Docker Image'
+  jobs:
+  - job: BuildAndPush
+    displayName: 'Build image and push to ACR'
+    steps:
+
+    # Step 1: Login to Azure Container Registry
+    - task: Docker@2
+      displayName: 'Login to ACR'
+      inputs:
+        command: login
+        containerRegistry: 'AzureContainerRegistry'   # ← Service connection name (set up in DevOps)
+
+    # Step 2: Build the Docker image
+    - task: Docker@2
+      displayName: 'Build Docker Image'
+      inputs:
+        command: build
+        repository: '$(ACR_LOGIN_SERVER)/$(IMAGE_NAME)'
+        dockerfile: 'Dockerfile'
+        tags: |
+          $(IMAGE_TAG)
+          latest
+
+    # Step 3: Push image to ACR
+    - task: Docker@2
+      displayName: 'Push Docker Image to ACR'
+      inputs:
+        command: push
+        repository: '$(ACR_LOGIN_SERVER)/$(IMAGE_NAME)'
+        tags: |
+          $(IMAGE_TAG)
+          latest
+
+# ══════════════════════════════════════════
+# STAGE 2: Deploy to Azure App Service
+# ══════════════════════════════════════════
+- stage: Deploy
+  displayName: '🚀 Deploy to App Service'
+  dependsOn: Build          # Only runs if Build stage succeeded
+  condition: succeeded()
+  jobs:
+  - deployment: DeployToAppService
+    displayName: 'Deploy container to App Service'
+    environment: 'production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+
+          # Step 4: Deploy the container image to Azure App Service
+          - task: AzureWebAppContainer@1
+            displayName: 'Deploy to App Service'
+            inputs:
+              azureSubscription: 'AzureServiceConnection'    # ← Service connection name
+              appName: '$(APP_SERVICE_NAME)'
+              resourceGroupName: '$(RESOURCE_GROUP)'
+              containers: '$(ACR_LOGIN_SERVER)/$(IMAGE_NAME):$(IMAGE_TAG)'

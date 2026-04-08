@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Details - D Vision</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-200">
+
+    <!-- Navbar -->
+    <nav class="bg-gray-800 p-4 flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-white">D Vision</h1>
+        <a href="{{ url_for('dashboard') }}" class="text-gray-300 hover:text-white">⬅ Back to Dashboard</a>
+    </nav>
+
+    <!-- Course Details Container -->
+    <div class="max-w-3xl mx-auto mt-10 bg-gray-800 p-6 rounded-lg shadow-lg">
+        <h2 class="text-3xl font-semibold text-blue-400">{{ course.title }}</h2>
+        <p class="mt-2 text-gray-300">{{ course.description }}</p>
+        <p class="mt-2"><strong>⭐ Rating:</strong> {{ course.rating }}</p>
+
+        <!-- Download Materials -->
+        {% if course.materials %}
+            <a href="{{ url_for('static', filename='uploads/' + course.materials) }}" 
+               class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition" 
+               download>📄 Download Materials</a>
+        {% endif %}
+
+        <!-- Rate the Course -->
+        <div class="mt-6">
+            <h3 class="text-lg font-semibold text-gray-200">Rate this Course:</h3>
+            <form method="POST" action="{{ url_for('rate_course', course_id=course.id) }}" class="mt-2">
+                <select name="rating" class="w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-gray-200">
+                    <option value="1">1 ⭐</option>
+                    <option value="2">2 ⭐⭐</option>
+                    <option value="3">3 ⭐⭐⭐</option>
+                    <option value="4">4 ⭐⭐⭐⭐</option>
+                    <option value="5">5 ⭐⭐⭐⭐⭐</option>
+                </select>
+                <textarea name="review" placeholder="Write a review (optional)" 
+                          class="w-full p-2 mt-2 bg-gray-700 border border-gray-600 rounded-md text-gray-200"></textarea>
+                <button type="submit" 
+                        class="mt-3 w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition">
+                    Submit Rating
+                </button>
+            </form>
+        </div>
+
+        <!-- Book the Course -->
+        <div class="mt-6">
+            <h3 class="text-lg font-semibold text-gray-200">Book this Course:</h3>
+            <form method="POST" action="{{ url_for('book_course', course_id=course.id) }}" class="mt-2">
+                <input type="text" name="time_slot" placeholder="Enter preferred time slot"
+                       class="w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-gray-200" required>
+                <button type="submit" 
+                        class="mt-3 w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition">
+                    📅 Book Now
+                </button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

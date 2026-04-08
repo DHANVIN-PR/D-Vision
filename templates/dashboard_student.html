@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - D Vision</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-200">
+
+    <!-- Navbar -->
+    <nav class="bg-gray-800 p-4 flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-white">D Vision</h1>
+        <a href="{{ url_for('logout') }}" class="text-gray-300 hover:text-white">🚪 Logout</a>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="max-w-5xl mx-auto mt-8 bg-gray-800 p-6 rounded-lg shadow-lg">
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="mb-4 p-3 bg-green-600 text-white rounded-md">
+              {% for message in messages %}
+                {{ message }}
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <!-- Header -->
+        <h2 class="text-3xl font-semibold text-blue-400">📚 Available Courses</h2>
+
+        <!-- Category Filter -->
+        <form method="GET" action="{{ url_for('dashboard') }}" class="mt-4 flex space-x-2">
+            <select name="category" class="p-2 bg-gray-700 border border-gray-600 rounded-md text-gray-200">
+                <option value="">All Categories</option>
+                {% for category in categories %}
+                    <option value="{{ category }}" {% if category == request.args.get('category') %}selected{% endif %}>
+                        {{ category }}
+                    </option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="bg-blue-500 px-4 py-2 rounded-md hover:bg-blue-600 transition">
+                Filter
+            </button>
+        </form>
+
+        <!-- Search Bar -->
+        <form method="GET" action="{{ url_for('search') }}" class="mt-4 flex space-x-2">
+            <input type="text" name="query" placeholder="🔍 Search courses..."
+                   class="w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-gray-200"
+                   value="{{ search_query }}">
+            <button type="submit" class="bg-blue-500 px-4 py-2 rounded-md hover:bg-blue-600 transition">Search</button>
+        </form>
+
+        <!-- Course Listings -->
+        {% if courses %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+            {% for course in courses %}
+            <div class="bg-gray-700 p-4 rounded-lg shadow-md hover:shadow-lg transition">
+                <h3 class="text-xl font-semibold text-blue-300">{{ course.title }}</h3>
+                <p class="text-gray-300 mt-2">{{ course.description }}</p>
+                <p class="text-yellow-400 mt-2">⭐ Rating: {{ course.rating }}</p>
+                <p class="text-gray-400">📂 Category: {{ course.category }}</p>
+                <p class="text-gray-400">👨‍🏫 Tutor: {{ course.tutor.name }}</p>
+                <p class="text-gray-400">✉️ Email: {{ course.tutor.email }}</p>
+                <p class="text-gray-400">📍 Location: {{ course.tutor.location }}</p>
+                <p class="text-gray-400">📞 Phone: {{ course.tutor.phone }}</p>
+
+                
+                <div class="mt-4 flex flex-col space-y-2">
+                    <a href="{{ url_for('course_details', course_id=course.id) }}" 
+                       class="bg-blue-500 text-white py-2 rounded-md text-center hover:bg-blue-600 transition">
+                        📖 View Details
+                    </a>
+                    <form method="POST" action="{{ url_for('book_course', course_id=course.id) }}">
+                        <input type="text" name="time_slot" placeholder="📅 Preferred Time Slot" required
+                               class="w-full p-2 bg-gray-600 border border-gray-500 rounded-md text-gray-200">
+                        <button type="submit" 
+                                onclick="this.innerText='Booking...'; this.disabled=true;"
+                                class="mt-2 bg-green-500 text-white py-2 rounded-md w-full hover:bg-green-600 transition">
+                            ✅ Book Course
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="mt-6 text-gray-400">🚫 No courses found for this filter/search.</p>
+        {% endif %}
+
+
+        <div class="mt-6 flex justify-end">
+            <a href="{{ url_for('tutor_clusters_by_category') }}"
+               class="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-4 py-2 rounded">
+                🧠 View Tutor Clusters
+            </a>
+        </div>
+        
+
+        <!-- Student Bookings -->
+        <h2 class="text-3xl font-semibold text-blue-400 mt-10">📝 Your Bookings</h2>
+        {% if student_bookings %}
+        <ul class="mt-4 space-y-3">
+            {% for booking in student_bookings %}
+            <li class="bg-gray-700 p-4 rounded-lg shadow-md">
+                <p class="text-lg text-gray-200">📌 {{ booking.course.title }}</p>
+                <p class="text-gray-300">🕒 Time Slot: {{ booking.time_slot }}</p>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="mt-4 text-gray-400">📭 You haven’t booked any courses yet.</p>
+        {% endif %}
+    </div>
+
+</body>
+</html>

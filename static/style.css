@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Apply a modern, clean font */
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Navigation Bar */
+nav {
+    @apply bg-gray-800 text-white p-4 flex justify-between items-center shadow-lg;
+}
+
+nav a {
+    @apply text-white font-semibold px-4 py-2 rounded-lg transition hover:bg-gray-700;
+}
+
+/* Main Container */
+.container {
+    @apply max-w-4xl mx-auto p-6 bg-gray-800 text-white rounded-lg shadow-lg;
+}
+
+/* Card-Based Layout */
+.card {
+    @apply bg-gray-700 p-6 rounded-lg shadow-md transition transform hover:scale-105;
+}
+
+/* Buttons */
+button {
+    @apply w-full bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg transition hover:bg-blue-600;
+}
+
+.delete-btn {
+    @apply bg-red-600 hover:bg-red-700;
+}
+
+/* Input Fields */
+input, select, textarea {
+    @apply w-full p-3 mt-2 bg-gray-900 text-white rounded-lg border border-gray-600 focus:border-blue-400;
+}
+
+/* Responsive Grid Layout */
+.grid-cols-2 {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    body {
+        @apply bg-gray-900 text-white;
+    }
+    .container {
+        @apply bg-gray-800;
+    }
+    .card {
+        @apply bg-gray-700;
+    }
+}

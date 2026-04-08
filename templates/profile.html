@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - D Vision</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white">
+
+    <!-- Navigation -->
+    <nav class="bg-gray-800 p-4 flex justify-between items-center shadow-md">
+        <h1 class="text-2xl font-bold text-white">D Vision</h1>
+        <a href="/dashboard" class="px-4 py-2 bg-blue-500 rounded hover:bg-blue-600 transition">📂 Dashboard</a>
+    </nav>
+
+    <!-- Profile Section -->
+    <div class="flex flex-col items-center mt-10">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-96 text-center">
+            <h2 class="text-3xl font-bold text-blue-300 mb-4">👤 Your Profile</h2>
+            
+            <!-- Profile Picture -->
+            <img src="{{ url_for('static', filename='uploads/' + user.profile_picture) }}" 
+                 alt="Profile Picture" class="w-32 h-32 rounded-full mx-auto border-4 border-blue-400 shadow-md">
+
+            <h3 class="text-xl font-semibold mt-4">{{ user.name }}</h3>
+            <p class="text-gray-400">{{ user.bio if user.bio else "No bio added yet." }}</p>
+        </div>
+
+        <!-- Profile Update Form -->
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-96 mt-6">
+            <h3 class="text-xl font-bold text-blue-300">✏️ Edit Profile</h3>
+            <form method="POST" enctype="multipart/form-data" class="mt-4">
+                <input type="text" name="name" value="{{ user.name }}" required 
+                       class="w-full p-3 bg-gray-700 rounded mb-4">
+                <textarea name="bio" placeholder="Your bio" 
+                          class="w-full p-3 bg-gray-700 rounded mb-4">{{ user.bio }}</textarea>
+                <input type="file" name="profile_picture" class="mb-4 w-full text-gray-300">
+                <button type="submit" class="w-full bg-green-500 py-2 rounded-lg hover:bg-green-600 transition">
+                    ✅ Update Profile
+                </button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
