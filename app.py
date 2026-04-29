@@ -364,8 +364,13 @@ def tutor_clusters():
     return render_template('tutor_clusters.html', clusters=clusters)
 
 
+# Safe database initialization for Azure
 with app.app_context():
-    db.create_all()
+    try:
+        db.create_all()
+        print("Database initialized successfully")
+    except Exception as e:
+        print("Database initialization skipped:", e)
 
 
 if __name__ == "__main__":
